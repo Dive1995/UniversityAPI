@@ -1,4 +1,5 @@
 ﻿using System;
+using Microsoft.EntityFrameworkCore;
 using StudentAPI.Models;
 
 namespace StudentAPI.Repository
@@ -12,30 +13,45 @@ namespace StudentAPI.Repository
             _context = context;
 		}
 
-        public void AddNewStudent(Student student)
+        public async Task<Student> AddNewStudentAsync(Student student)
         {
-            _context.Students.Add(student);
-
+            await _context.Students.AddAsync(student);
+            SaveChanges();
+            return student;
         }
 
-        public ICollection<Student> GetAllStudents()
+        public async Task<ICollection<Student>> GetAllStudentsAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Students.Include(s => s.Degree.Name).ToListAsync();
         }
 
-        public Student GetStudent(int id)
+        public async Task<Student> GetStudentAsync(string registrationId)
         {
-            throw new NotImplementedException();
+            return await _context.Students.Include(s => s.Degree).Where(s => s.RegistrationId == registrationId).FirstOrDefaultAsync();
         }
 
-        public ICollection<Student> GetStudentsByDegree(int degreeId)
+        public async Task<ICollection<Student>> GetStudentsByDegreeAsync(int degreeId)
         {
-            throw new NotImplementedException();
+            return await _context.Students.Include(s => s.Degree).Where(s => s.DegreeId == degreeId).ToListAsync();
         }
 
-        public Student UpdateStudent(Student student)
+        public async Task<Student> UpdateStudentAsync(Student student)
         {
-            throw new NotImplementedException();
+            var studentToBeUpdated = await _context.Students.Include(s => s.Degree).FirstOrDefaultAsync(s => s.RegistrationId == student.RegistrationId);
+
+            if (studentToBeUpdated != null)
+            {
+                studentToBeUpdated.FirstName = student.FirstName;
+                studentToBeUpdated.LastName = student.LastName;
+                studentToBeUpdated.Batch = student.Batch;
+                SaveChanges();
+            }
+            return studentToBeUpdated;
+        }
+
+        public async Task<Student> GetRunningIdAsync()
+        {
+            return await _context.Students.OrderByDescending(s => s.Id).FirstOrDefaultAsync();
         }
 
         public void SaveChanges()

@@ -5,11 +5,12 @@ namespace StudentAPI.Repository
 {
 	public interface IStudentRepository
 	{
-		Student GetStudent(string registrationId);
-		ICollection<Student> GetAllStudents();
-		ICollection<Student> GetStudentsByDegree(int degreeId);
-		void AddNewStudent(Student student);
-		Student UpdateStudent(Student student);
+		Task<Student> GetStudentAsync(string registrationId);
+		Task<ICollection<Student>> GetAllStudentsAsync();
+		Task<ICollection<Student>> GetStudentsByDegreeAsync(int degreeId);
+		Task<Student> AddNewStudentAsync(Student student);
+		Task<Student> UpdateStudentAsync(Student student);
+		Task<Student> GetRunningIdAsync();
 		void SaveChanges();
 	}
 }
