@@ -31,25 +31,70 @@ namespace StudentAPI.BLL
 		public async Task<StudentReadDto> AddNewStudent(StudentCreationDto studentCreation)
 		{
 			var student = _mapper.Map<Student>(studentCreation);
+
 			var degree = await _degreeRepository.GetDegreeByIdAsync(student.DegreeId);
-			var lastRunningStudent = await GetRunningIdAsync();
 
-			var registrationId = degree.Code + student.Batch + (lastRunningStudent.Id + 1);
+			if(degree == null)
+			{
+				return null; // should throw en error with message, and the global exception handling should handle it
+			}
 
+			var lastRunningStudent = await GetRunningIdByBatchAsync(student.Batch);
+			int currentStudentRunningId;
+
+            if (lastRunningStudent == null)
+			{
+                currentStudentRunningId = 1;
+			}
+			else
+			{
+				currentStudentRunningId = lastRunningStudent.Id + 1;
+			}
+
+			student.Id = currentStudentRunningId;
+
+			var registrationId = degree.Code + student.Batch + currentStudentRunningId.ToString("0000");
 			student.RegistrationId = registrationId;
-			var createdStudent = await _studentRepository.AddNewStudentAsync(student);
-			return _mapper.Map<StudentReadDto>(createdStudent);
+
+			await _studentRepository.AddNewStudentAsync(student);
+			_studentRepository.SaveChanges();
+
+			return _mapper.Map<StudentReadDto>(student);
 		}
 
 		public async Task<StudentReadDto> UpdateStudent(Student student)
 		{
-			return _mapper.Map<StudentReadDto>(await _studentRepository.UpdateStudentAsync(student));
+			// Check if student exist
+			var studentRecordToBeUpdated = await _studentRepository.GetStudentAsync(student.RegistrationId);
+			if(studentRecordToBeUpdated == null)
+			{
+				return null;
+			}
+
+			// If batch has changed add new record & delete old record
+			if(studentRecordToBeUpdated.Batch != student.Batch)
+			{
+				return await AddNewStudent(_mapper.Map<StudentCreationDto>(student));
+				// delete the old record
+			}
+
+            studentRecordToBeUpdated.FirstName = student.FirstName;
+            studentRecordToBeUpdated.LastName = student.LastName;
+            studentRecordToBeUpdated.Batch = student.Batch;
+
+			_studentRepository.SaveChanges();
+            return _mapper.Map<StudentReadDto>(studentRecordToBeUpdated);
 		}
 
-		public async Task<Student> GetRunningIdAsync()
+		public async Task<Student> GetRunningIdByBatchAsync(int batch)
 		{
-			return await _studentRepository.GetRunningIdAsync();
+			return await _studentRepository.GetRunningIdByBatchAsync(batch);
 		}
 
+		public async Task<ICollection<StudentReadDto>> SearchStudentByName(string name)
+		{
+			var searchResult = await _studentRepository.GetStudentByNameAsync(name);
+			return _mapper.Map<ICollection<StudentReadDto>>(searchResult);
+		}
     }
 }

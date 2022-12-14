@@ -7,14 +7,14 @@ namespace StudentAPI.Models
 	{
         [Required]
         [MinLength(3)]
-        public string FirstName { get; set; } = null!;
+        public string? FirstName { get; set; }
         [Required]
         [MinLength(3)]
-        public string LastName { get; set; } = null!;
+        public string? LastName { get; set; }
         [Required]
-        public string Address { get; set; } = null!;
+        public string? Address { get; set; }
         [Required]
-        public string MobileNum { get; set; } = null!;
+        public string? MobileNum { get; set; }
         public string? LandlineNum { get; set; }
         [Required]
         public DateTime DateOfBirth { get; set; }

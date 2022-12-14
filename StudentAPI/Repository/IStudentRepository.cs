@@ -9,8 +9,9 @@ namespace StudentAPI.Repository
 		Task<ICollection<Student>> GetAllStudentsAsync();
 		Task<ICollection<Student>> GetStudentsByDegreeAsync(int degreeId);
 		Task<Student> AddNewStudentAsync(Student student);
-		Task<Student> UpdateStudentAsync(Student student);
-		Task<Student> GetRunningIdAsync();
+		//Task<Student> UpdateStudentAsync(Student student);
+		Task<Student> GetRunningIdByBatchAsync(int batch);
+		Task<ICollection<Student>> GetStudentByNameAsync(string name);
 		void SaveChanges();
 	}
 }

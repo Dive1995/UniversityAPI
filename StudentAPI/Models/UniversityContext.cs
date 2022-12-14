@@ -49,6 +49,12 @@ namespace StudentAPI.Models
 
             modelBuilder.Entity<Student>(entity =>
             {
+                entity.HasKey(e => e.RegistrationId);
+
+                entity.Property(e => e.RegistrationId)
+                    .HasMaxLength(15)
+                    .IsUnicode(false);
+
                 entity.Property(e => e.Address).HasMaxLength(255);
 
                 entity.Property(e => e.DateOfBirth).HasColumnType("date");
@@ -63,10 +69,6 @@ namespace StudentAPI.Models
 
                 entity.Property(e => e.MobileNum)
                     .HasMaxLength(10)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.RegistrationId)
-                    .HasMaxLength(15)
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Degree)
