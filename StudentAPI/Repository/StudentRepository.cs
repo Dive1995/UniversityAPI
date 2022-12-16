@@ -19,9 +19,9 @@ namespace StudentAPI.Repository
             return student;
         }
 
-        public async Task<ICollection<Student>> GetAllStudentsAsync()
+        public async Task<ICollection<Student>> GetAllStudentsAsync(int page, int pageResult)
         {
-            return await _context.Students.Include(s => s.Degree).ToListAsync();
+            return await _context.Students.Skip((page - 1)*pageResult).Take(pageResult).Include(s => s.Degree).ToListAsync();
         }
 
         public async Task<Student> GetStudentAsync(string registrationId)
@@ -47,6 +47,11 @@ namespace StudentAPI.Repository
         public async Task<ICollection<Student>> GetStudentByNameAsync(string name)
         {
             return await _context.Students.Where(s => s.FirstName.Contains(name) || s.LastName.Contains(name)).ToListAsync();
+        }
+
+        public async Task<int> StudentCountAsync()
+        {
+            return await _context.Students.CountAsync();
         }
     }
 }

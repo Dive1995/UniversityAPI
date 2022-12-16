@@ -17,16 +17,16 @@ namespace StudentAPI.Controllers
 		}
 
         [HttpGet]
-        public async Task<ActionResult<ICollection<StudentReadDto>>> GetAllStudents()
-        {
-            var allStudents = await _studentBLL.GetAllStudents();
+        public async Task<ActionResult<StudentResponse>> GetAllStudents([FromQuery] int page)
+        {            
+            var response = await _studentBLL.GetAllStudents(page);
 
-            if (allStudents == null)
+            if (response.Students.Count == 0)
             {
-                return BadRequest();
+                return NotFound();
             }
 
-            return Ok(allStudents);
+            return Ok(response);
         }
 
         [HttpGet("{registrationId}", Name = "GetStudent")]
@@ -36,7 +36,7 @@ namespace StudentAPI.Controllers
 
             if(student == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             return Ok(student);
@@ -63,6 +63,12 @@ namespace StudentAPI.Controllers
             return Ok(result);
         }
 
+        [HttpPatch("update")]
+        public async Task<ActionResult<StudentReadDto>> UpdateStudent([FromBody] StudentUpdateDto student)
+        {
+            var result = await _studentBLL.UpdateStudent(student);
+            return Ok(result);
+        }
 
     }
 }

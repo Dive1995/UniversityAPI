@@ -8,7 +8,8 @@ namespace StudentAPI.Profiles
 	{
 		public StudentMapperProfile()
 		{
-			CreateMap<StudentCreationDto, Student>();
+			CreateMap<StudentCreationDto, Student>().ReverseMap();
+			CreateMap<StudentUpdateDto, Student>();
 			CreateMap<Student, StudentReadDto>();
 		}
 	}

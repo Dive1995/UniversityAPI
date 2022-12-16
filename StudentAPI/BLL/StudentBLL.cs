@@ -18,9 +18,21 @@ namespace StudentAPI.BLL
 			_mapper = mapper;
 		}
 
-		public async Task<ICollection<StudentReadDto>> GetAllStudents()
-		{			
-			return _mapper.Map<ICollection<StudentReadDto>>(await _studentRepository.GetAllStudentsAsync()); 
+		public async Task<StudentResponse> GetAllStudents(int page)
+		{
+            var pageResults = 3f;
+			var studentCount = await _studentRepository.StudentCountAsync();
+			var pageCount = Math.Ceiling(studentCount / pageResults);
+
+			var students = _mapper.Map<ICollection<StudentReadDto>>(await _studentRepository.GetAllStudentsAsync(page, (int)pageResults));
+			var response = new StudentResponse
+			{
+				Students = students,
+				CurrentPage = page,
+				Pages = (int)pageCount
+			};
+
+			return response;
 		}
 
 		public async Task<StudentReadDto> GetStudent(string id)
@@ -62,8 +74,9 @@ namespace StudentAPI.BLL
 			return _mapper.Map<StudentReadDto>(student);
 		}
 
-		public async Task<StudentReadDto> UpdateStudent(Student student)
+		public async Task<StudentReadDto> UpdateStudent(StudentUpdateDto studentUpdateDto)
 		{
+			var student = _mapper.Map<Student>(studentUpdateDto);
 			// Check if student exist
 			var studentRecordToBeUpdated = await _studentRepository.GetStudentAsync(student.RegistrationId);
 			if(studentRecordToBeUpdated == null)

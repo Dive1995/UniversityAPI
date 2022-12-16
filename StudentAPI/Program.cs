@@ -8,12 +8,22 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-//http://localhost:4200/
+
 builder.Services.AddCors(option =>
     option.AddPolicy("DefaultPolicy", policy =>
         policy.AllowAnyHeader().
             AllowAnyMethod().
             AllowAnyOrigin()));
+
+//builder.Services.AddHttpClient("HttpClientWithSSLUntrusted").ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+//{
+//    ClientCertificateOptions = ClientCertificateOption.Manual,
+//    ServerCertificateCustomValidationCallback =
+//            (httpRequestMessage, cert, cetChain, policyErrors) =>
+//            {
+//                return true;
+//            }
+//});
 
 //builder.Services.AddControllers();
 builder.Services.AddControllers().AddJsonOptions(x =>
